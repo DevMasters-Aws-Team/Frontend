@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  --color-kiro-primary: #3B82F6;
+  --color-kiro-success: #10B981;
+  --color-kiro-warning: #F59E0B;
+  --color-kiro-error: #EF4444;
+  --color-kiro-info: #6366F1;
+  --color-bg-primary: #0F172A;
+  --color-bg-secondary: #1E293B;
+  --color-bg-tertiary: #334155;
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: #F8FAFC;
+  font-family: 'Inter', system-ui, sans-serif;
+}
