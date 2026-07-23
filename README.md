@@ -33,15 +33,21 @@ Este repositorio contiene la interfaz de usuario. Al igual que el Backend, este 
 |------------|-----------|
 | React 18 | Librería principal de interfaces |
 | Vite 5 | Bundler y entorno de desarrollo ultra-rápido |
-| TypeScript | Tipado estático para mayor mantenibilidad |
-| Vanilla CSS | Estilización de componentes con alto rendimiento y control |
-| Recharts / Chart.js | Visualización de datos y métricas (Opcional) |
+| TypeScript 5.3 | Tipado estático para mayor mantenibilidad |
+| TailwindCSS 3.4 | Estilos utilitarios (dark mode por defecto) |
+| Recharts 2.12 | Visualización de datos y métricas |
+| @tanstack/react-query 5 | Estado de servidor con auto-refresh |
+| Zustand 4.5 | Estado global de UI ligero |
 
 ### **Dependencias Principales**:
 - **react-router-dom** - Enrutamiento de páginas
 - **axios** - Cliente HTTP para consumir la API del Backend
-- **eslint / prettier** - Análisis estático y formateo de código
-- **vitest / testing-library** - Pruebas unitarias de componentes
+- **@tanstack/react-query** - Cache y sincronización de datos server
+- **zustand** - Estado UI global (filtros, sidebar, theme)
+- **recharts** - Gráficos de métricas (error rate, latencia)
+- **lucide-react** - Iconos
+- **date-fns** - Formateo de fechas relativas
+- **eslint** + **prettier** - Análisis estático y formateo
 
 ----
 
@@ -82,8 +88,10 @@ La aplicación utiliza variables de entorno (archivo `.env`) para la configuraci
 
 | Variable | Descripción | Valor por Defecto |
 |----------|-------------|-------------------|
-| `VITE_API_BASE_URL` | URL del Backend Mock | `http://localhost:8000/api/v1` |
-| `VITE_ENVIRONMENT` | Entorno activo (dev/prod) | `dev` |
+| `VITE_API_URL` | URL del Backend API | `http://localhost:8000` |
+| `VITE_REFRESH_INTERVAL` | Intervalo de refresh de datos (ms) | `5000` |
+| `VITE_COGNITO_USER_POOL_ID` | Cognito User Pool ID | — |
+| `VITE_COGNITO_APP_CLIENT_ID` | Cognito App Client ID | — |
 
 ---
 
@@ -93,28 +101,29 @@ Siguiendo el flujo **Specs Driven Development (SDD)**, antes de escribir los com
 
 ```text
 Frontend/
-├── 📂 .kiro/                         # Fase de Setup / SDD (Definiciones en Markdown)
-│   ├── global_steering.md            # Reglas de diseño (UI/UX) y convenciones React/Vite
-│   ├── components.md                 # Spec de los componentes visuales (Dashboard, Tablas, Gráficos)
-│   ├── hooks_ui.md                   # Spec de los Custom Hooks (ej. useMetrics, useKiroFeed)
-│   ├── mcp.md                        # Spec si el Front expone contexto de UI al agente (opcional)
-│   └── architecture_specs.md         # Specs de rutas, estado global e integraciones
+├── 📂 .kiro/steering/                # Fase de Setup / SDD (Definiciones en Markdown)
+│   ├── global_steering.md            # Convenciones React/TS, paleta dark mode, accesibilidad AA
+│   ├── architecture_specs.md         # Rutas, diagrama componentes, estado React Query/Zustand
+│   ├── components.md                 # Spec de componentes: MetricsPanel, AlertsTable, ChaosPanel, ActivityFeed
+│   ├── hooks_ui.md                   # Custom Hooks: useMetrics, useAlerts, useKiroStatus, useChaos
+│   └── mcp.md                        # Integración con backend MCP, configuración API
 │
-├── 📂 .git/hooks/                    # ⚡ Git Hooks (Configurados por la IA en base a hooks_ui.md)
-│   └── pre-commit                    # Hook que corre "ESLint" y "Vitest" al guardar/comitear
+├── 📂 src/                           # ⚙️ Código Fuente
+│   ├── 📂 components/                # Componentes React (Dashboard, Charts, Chaos, Tickets, Layout)
+│   ├── 📂 hooks/                     # Custom Hooks de React
+│   ├── 📂 services/                  # API services (axios)
+│   ├── 📂 stores/                    # Zustand stores (estado UI global)
+│   ├── 📂 types/                     # TypeScript interfaces
+│   ├── 📂 utils/                     # Formatters y constantes
+│   ├── App.tsx                       # Root component con Router
+│   └── main.tsx                      # Entry point
 │
-├── 📂 src/                           # ⚙️ Código Fuente (Generado en la Fase de Build)
-│   ├── 📂 assets/                    # Imágenes, íconos y CSS base
-│   ├── 📂 components/                # Componentes reutilizables (Botones, Tarjetas, Gráficos)
-│   ├── 📂 hooks/                     # Custom Hooks de React generados por IA
-│   ├── 📂 pages/                     # Vistas principales (Dashboard, Incidentes, Chaos)
-│   ├── 📂 services/                  # Clientes API (Axios fetchers)
-│   ├── App.tsx                       # Componente raíz y Rutas
-│   └── main.tsx                      # Punto de entrada de React
-│
-├── package.json                      # Dependencias y scripts de Node
-├── vite.config.ts                    # Configuración de Vite
-└── Dockerfile                        # Configuración para servir con Nginx
+├── index.html
+├── package.json                      # Dependencies + scripts
+├── vite.config.ts                    # Vite config + proxy a backend
+├── tailwind.config.js                # TailwindCSS config (dark mode)
+├── tsconfig.json
+└── Dockerfile                        # Multi-stage build (Vite → Nginx)
 ```
 
 ---
